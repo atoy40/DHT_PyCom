@@ -12,11 +12,13 @@ class DTHResult:
     error_code = ERR_NO_ERROR
     temperature = -1
     humidity = -1
+    raw = []
 
-    def __init__(self, error_code, temperature, humidity):
+    def __init__(self, error_code, temperature, humidity, raw):
         self.error_code = error_code
         self.temperature = temperature
         self.humidity = humidity
+        self.raw = raw
 
     def is_valid(self):
         return self.error_code == DTHResult.ERR_NO_ERROR
@@ -49,7 +51,7 @@ class DTH:
         		bits.append(1)
         #print("longueur bits : %d " % len(bits))
         if len(bits) != 40:
-            return DTHResult(DTHResult.ERR_MISSING_DATA, 0, 0)
+            return DTHResult(DTHResult.ERR_MISSING_DATA, 0, 0, [])
         #print(bits)
         # we have the bits, calculate bytes
         the_bytes = self.__bits_to_bytes(bits)
@@ -67,7 +69,7 @@ class DTH:
             t = (((int_t & 0x7F) * 256) + dec_t)/10
             if (int_t & 0x80) > 0:
                 t *= -1
-        return DTHResult(DTHResult.ERR_NO_ERROR, t, rh)
+        return DTHResult(DTHResult.ERR_NO_ERROR, t, rh, the_bytes)
 
 
     def __send_and_sleep(self, output, mysleep):
